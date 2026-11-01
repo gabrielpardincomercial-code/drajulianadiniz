@@ -268,4 +268,64 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+
+  // ==========================================
+  // 7. BEFORE & AFTER COMPARISON SLIDERS
+  // ==========================================
+  const initBeforeAfterSliders = () => {
+    const sliders = document.querySelectorAll('.clireo-ba-slider');
+    sliders.forEach(slider => {
+      const overlay = slider.querySelector('.clireo-ba-overlay');
+      const handle = slider.querySelector('.clireo-ba-handle');
+      const range = slider.querySelector('.clireo-ba-range');
+      const btnBefore = slider.querySelector('.clireo-ba-before');
+      const btnAfter = slider.querySelector('.clireo-ba-after');
+
+      if (!overlay || !handle || !range) return;
+
+      const setPos = (val, animate = false) => {
+        val = Math.max(0, Math.min(100, val));
+        range.value = val;
+        if (animate) {
+          overlay.style.transition = 'clip-path 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
+          handle.style.transition = 'left 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
+          setTimeout(() => {
+            overlay.style.transition = '';
+            handle.style.transition = '';
+          }, 360);
+        } else {
+          overlay.style.transition = '';
+          handle.style.transition = '';
+        }
+        overlay.style.clipPath = `inset(0 0 0 ${val}%)`;
+        handle.style.left = `${val}%`;
+      };
+
+      range.addEventListener('input', (e) => {
+        setPos(e.target.value);
+      });
+
+      if (btnBefore) {
+        btnBefore.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setPos(0, true);
+        });
+      }
+
+      if (btnAfter) {
+        btnAfter.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setPos(100, true);
+        });
+      }
+
+      // Initial state
+      setPos(50);
+    });
+  };
+
+  initBeforeAfterSliders();
+
 });
