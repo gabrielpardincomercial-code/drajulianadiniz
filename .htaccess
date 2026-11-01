@@ -1,0 +1,65 @@
+# Adilson Madoglio - Hostinger LiteSpeed configuration (.htaccess)
+DirectoryIndex index.html
+Options -Indexes
+RewriteEngine On
+
+# ---- HTTPS ----
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# ---- Never expose dev / git / sensitive files ----
+RedirectMatch 404 /\.git
+<FilesMatch "^(\.gitignore|README\.md|package(-lock)?\.json)$">
+  Require all denied
+</FilesMatch>
+
+# ---- Canonical URLs: no /index.html and no .html ----
+RewriteCond %{THE_REQUEST} \s/(.*)index\.html[\s?] [NC]
+RewriteRule ^(.*)index\.html$ /$1 [R=301,L,NC]
+RewriteCond %{THE_REQUEST} \s/(.+)\.html[\s?] [NC]
+RewriteRule ^(.+)\.html$ /$1 [R=301,L,NC]
+
+# ---- Clean URLs: /about -> about.html ----
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.*)$ $1.html [L,QSA]
+
+# Trailing slash for real directories
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^(.+[^/])$ /$1/ [R=301,L]
+
+ErrorDocument 404 /404.html
+
+# ---- Security headers ----
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+</IfModule>
+
+# ---- MIME types ----
+<IfModule mod_mime.c>
+  AddType font/woff2 .woff2
+  AddType font/woff .woff
+  AddType font/ttf .ttf
+  AddType image/svg+xml .svg
+  AddType image/webp .webp
+</IfModule>
+
+# ---- Browser Caching ----
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/jpg "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/gif "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType font/woff "access plus 1 year"
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+</IfModule>

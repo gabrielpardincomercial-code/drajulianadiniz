@@ -1,0 +1,52 @@
+/* Clireo Healthcare - Dynamic Animations & Transitions */
+
+@keyframes clireo-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.clireo-ticker-active {
+  display: flex !important;
+  width: max-content !important;
+  animation: clireo-marquee 28s linear infinite !important;
+  will-change: transform;
+}
+
+.clireo-ticker-active:hover {
+  animation-play-state: paused;
+}
+
+/* Smooth transition for text reveal */
+[data-framer-name="About"] h2 span {
+  transition: color 0.25s ease-out, opacity 0.25s ease-out;
+}
+
+/* Card hover elevations */
+.framer-RYwQL:hover {
+  transform: translateY(-4px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.2);
+}
+
+/* Buttons micro-interactions */
+button[type="submit"]:hover, .btn-primary:hover, a[data-framer-name="Primary"]:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+/* Arrows hover */
+button[aria-label="Previous"]:hover, button[aria-label="Next"]:hover {
+  transform: scale(1.08);
+  filter: brightness(0.95);
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
