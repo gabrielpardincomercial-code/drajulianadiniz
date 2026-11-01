@@ -1,5 +1,39 @@
 /* Clireo Healthcare - Dynamic Animations & Transitions */
 
+/* 1. Word-by-word stagger appear animation for Hero & Key Headlines */
+.clireo-word-appear {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(22px);
+  animation: clireoWordAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(var(--word-index, 0) * 0.12s + 0.15s);
+  will-change: opacity, transform, filter;
+}
+
+@keyframes clireoWordAppear {
+  to {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0);
+  }
+}
+
+/* 2. Scroll-driven text reveal for Sticky Section */
+.clireo-reveal-word {
+  display: inline-block;
+  margin-right: 0.25em;
+  color: rgba(26, 40, 120, 0.18);
+  transition: color 0.25s ease-out, opacity 0.25s ease-out, filter 0.25s ease-out;
+  will-change: color, opacity;
+}
+
+.clireo-reveal-word.is-active {
+  color: rgb(27, 41, 120) !important;
+  opacity: 1 !important;
+}
+
+/* 3. Infinite Marquee Ticker */
 @keyframes clireo-marquee {
   0% {
     transform: translateX(0);
@@ -20,33 +54,28 @@
   animation-play-state: paused;
 }
 
-/* Smooth transition for text reveal */
-[data-framer-name="About"] h2 span {
-  transition: color 0.25s ease-out, opacity 0.25s ease-out;
-}
-
-/* Card hover elevations */
-.framer-RYwQL:hover {
+/* 4. Card hover elevations */
+.framer-RYwQL:hover, .framer-1a48c4v:hover, .framer-5q2k47:hover {
   transform: translateY(-4px);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.2);
 }
 
-/* Buttons micro-interactions */
+/* 5. Buttons micro-interactions */
 button[type="submit"]:hover, .btn-primary:hover, a[data-framer-name="Primary"]:hover {
   transform: translateY(-1px);
-  filter: brightness(1.1);
+  filter: brightness(1.08);
   transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-/* Arrows hover */
+/* 6. Arrows hover */
 button[aria-label="Previous"]:hover, button[aria-label="Next"]:hover {
   transform: scale(1.08);
   filter: brightness(0.95);
   transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-/* Smooth scrolling */
+/* 7. Smooth scrolling */
 html {
   scroll-behavior: smooth;
 }

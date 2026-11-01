@@ -27,37 +27,53 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // 2. SCROLL-DRIVEN TEXT REVEAL (About Clireo)
+  // 2. SCROLL-DRIVEN WORD-BY-WORD TEXT REVEAL
   // ==========================================
-  const aboutSection = document.querySelector('[data-framer-name="About"]');
-  if (aboutSection) {
-    const textSpans = aboutSection.querySelectorAll('h2 span');
-    if (textSpans.length > 0) {
-      const updateScrollReveal = () => {
-        const rect = aboutSection.getBoundingClientRect();
+  const initScrollTextReveal = () => {
+    const stickyHeadings = document.querySelectorAll(
+      'h2[style*="position:sticky"], .framer-1oz7viq h2, [data-code-component-plugin-id="84d4c1"] h2'
+    );
+    
+    stickyHeadings.forEach(h2 => {
+      let spans = h2.querySelectorAll('span');
+      if (spans.length === 0) {
+        const words = h2.textContent.trim().split(/\s+/);
+        h2.innerHTML = words.map(w => `<span class="clireo-reveal-word">${w}</span>`).join(' ');
+        spans = h2.querySelectorAll('span');
+      } else {
+        spans.forEach(s => s.classList.add('clireo-reveal-word'));
+      }
+
+      const container = h2.closest('.framer-1oz7viq') || h2.closest('.framer-q64aqy-container') || h2.parentElement;
+
+      const updateProgress = () => {
+        const target = container || h2;
+        const rect = target.getBoundingClientRect();
         const windowHeight = window.innerHeight;
-        
-        // Progress from 0 (entering screen) to 1 (center of screen)
+
+        // Progress calculates as user scrolls through the section
         const start = windowHeight * 0.85;
         const end = windowHeight * 0.25;
         const progress = Math.min(Math.max((start - rect.top) / (start - end), 0), 1);
-        
-        const activeCount = Math.floor(progress * textSpans.length);
-        textSpans.forEach((span, i) => {
-          if (i <= activeCount) {
-            span.style.color = 'rgb(27, 41, 120)';
-            span.style.opacity = '1';
+
+        const activeIndex = progress * spans.length;
+        spans.forEach((span, i) => {
+          if (i <= activeIndex) {
+            span.classList.add('is-active');
           } else {
-            span.style.color = 'rgba(26, 40, 120, 0.2)';
-            span.style.opacity = '0.5';
+            span.classList.remove('is-active');
           }
         });
       };
 
-      window.addEventListener('scroll', updateScrollReveal, { passive: true });
-      updateScrollReveal();
-    }
-  }
+      window.addEventListener('scroll', updateProgress, { passive: true });
+      window.addEventListener('resize', updateProgress, { passive: true });
+      // Initial trigger
+      updateProgress();
+    });
+  };
+
+  initScrollTextReveal();
 
   // ==========================================
   // 3. OUR TREATMENTS SLIDER (Prev / Next & Swipe)
@@ -130,25 +146,22 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================
   // 4. FAQ ACCORDION INTERACTIVITY
   // ==========================================
-  const faqSection = document.querySelector('[data-framer-name="FAQs"]');
+  const faqSection = document.querySelector('[data-framer-name="FAQ"]');
   if (faqSection) {
     const faqAnswers = {
-      'How can I schedule an appointment?': 'You can easily schedule an appointment online using our booking form, by phone at +44 501 255 001, or by visiting our clinic reception. We offer flexible scheduling with same-day and weekend availability.',
-      'Do I need a referral to see a specialist?': 'No prior referral is required for the majority of our specialties, including dental consultations, pediatrics, and cosmetic care. You can book an appointment directly with any of our specialists.',
-      'What should I bring to my first appointment?': 'Please bring a valid photo ID, your insurance information (if applicable), and any relevant prior medical records, diagnostic scans, or medication lists to ensure the most thorough consultation.',
-      'Do you offer care for children and families?': 'Yes! Our pediatric specialists and family medicine team provide comprehensive, gentle care for patients of all ages, from newborns to seniors, in a family-friendly environment.',
-      'Why choose Clireo for your healthcare needs?': 'Clireo unites top-tier clinical specialists, modern diagnostic equipment, and a patient-first approach ensuring comfort, clear communication, and personalized treatment plans.'
+      "How can I schedule an appointment?": "You can schedule an appointment by filling out the online booking form on our homepage, calling our clinic directly, or sending us a message on WhatsApp. Our reception team will confirm your preferred date and time promptly.",
+      "Do I need a referral to see a specialist?": "No referral is required for most consultations. You can directly book an appointment with any of our general physicians, dentists, or pediatric specialists at your convenience.",
+      "What should I bring to my first appointment?": "Please bring a valid photo ID, your insurance card (if applicable), and any relevant previous medical records, test results, or prescription lists to help our doctors provide the best care.",
+      "Do you offer care for children and families?": "Yes! We provide specialized pediatric care for infants, children, and adolescents, alongside comprehensive family medicine, dentistry, and preventive wellness checkups.",
+      "Why choose Clireo for your healthcare needs?": "Clireo combines board-certified specialists, state-of-the-art diagnostic technology, transparent pricing, and a warm, patient-first approach to ensure exceptional care in every visit."
     };
 
-    // Find all FAQ question containers
     const questionNodes = faqSection.querySelectorAll('.framer-text');
     questionNodes.forEach(node => {
       const qText = node.textContent.trim();
       if (faqAnswers[qText]) {
-        // Find the parent item container
         const itemCard = node.closest('.framer-i8Jws') || node.closest('.framer-1x1hh8-container');
         if (itemCard) {
-          // Check if answer already exists
           let ansWrapper = itemCard.querySelector('.clireo-faq-answer');
           if (!ansWrapper) {
             ansWrapper = document.createElement('div');
@@ -161,7 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
             itemCard.appendChild(ansWrapper);
           }
 
-          // Make card clickable
           const headerRow = node.closest('[data-framer-name="Icon Wrap"]')?.parentElement || node.parentElement;
           if (headerRow) {
             headerRow.style.cursor = 'pointer';
@@ -193,7 +205,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Make the first question (which already had answer) also toggleable
     const firstQ = faqSection.querySelector('[data-framer-name="Answer"]');
     if (firstQ) {
       const firstParent = firstQ.closest('.framer-7546z8') || firstQ.parentElement;
@@ -227,7 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================
   const form = document.querySelector('form');
   if (form) {
-    // Prevent default page reload and show feedback
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const submitBtn = form.querySelector('button[type="submit"]');
